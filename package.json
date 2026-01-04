@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspaces",
-    "build": "npm run build --workspaces",
+    "build": "npm --prefix packages/game-logic run build && npm --prefix packages/backend run build && npm --prefix packages/frontend run build",
     "start": "npm start --workspaces"
   },
   "devDependencies": {
