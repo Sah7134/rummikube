@@ -32,33 +32,40 @@ function App() {
       }
     }
     
-    console.log('Connecting to server:', serverUrl);
+    console.log('🔌 Connecting to server:', serverUrl);
+    console.log('📍 Current hostname:', window.location.hostname);
+    
     const socketInstance = io(serverUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5
+      reconnectionAttempts: 5,
+      transports: ['websocket', 'polling']
     });
 
     socketInstance.on('connect', () => {
-      console.log('Connected to server');
+      console.log('✅ Connected to server');
       const id = `player-${Date.now()}`;
       setPlayerId(id);
       setIsConnected(true);
     });
 
+    socketInstance.on('connect_error', (error: any) => {
+      console.error('❌ Connection error:', error);
+    });
+
     socketInstance.on('game_started', (state: GameState) => {
-      console.log('Game started:', state);
+      console.log('🎮 Game started:', state);
       setGameState(state);
       setLoading(false);
     });
 
     socketInstance.on('player_joined', (data: any) => {
-      console.log('Player joined:', data);
+      console.log('👤 Player joined:', data);
     });
 
     socketInstance.on('disconnect', () => {
-      console.log('Disconnected from server');
+      console.log('⛔ Disconnected from server');
       setIsConnected(false);
     });
 

@@ -9,7 +9,8 @@ const httpServer = createServer(app);
 // Determine allowed origins based on environment
 const allowedOrigins = [
     'http://localhost:3000',
-    'http://localhost:3001'
+    'http://localhost:3001',
+    /https:\/\/.*\.onrender\.com$/ // Allow any Render.com domain
 ];
 if (process.env.CLIENT_URL)
     allowedOrigins.push(process.env.CLIENT_URL);
