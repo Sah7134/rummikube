@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
@@ -32,7 +32,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/api/health', (req: Request, res: Response) => {
+app.get('/api/health', (req: any, res: any) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
