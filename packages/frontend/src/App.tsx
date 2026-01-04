@@ -1,0 +1,114 @@
+import { useState, useEffect } from 'react';
+import { io, Socket } from 'socket.io-client';
+import './App.css';
+
+interface GameState {
+  players: string[];
+  currentPlayer: string;
+  gameStatus: string;
+}
+
+function App() {
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [playerId, setPlayerId] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const serverUrl = 
+      (import.meta as any).env.VITE_SERVER_URL || 
+      'http://localhost:4000';
+    
+    console.log('Connecting to server:', serverUrl);
+    const socketInstance = io(serverUrl, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5
+    });
+
+    socketInstance.on('connect', () => {
+      console.log('Connected to server');
+      const id = `player-${Date.now()}`;
+      setPlayerId(id);
+      setIsConnected(true);
+    });
+
+    socketInstance.on('game_started', (state: GameState) => {
+      console.log('Game started:', state);
+      setGameState(state);
+      setLoading(false);
+    });
+
+    socketInstance.on('player_joined', (data: any) => {
+      console.log('Player joined:', data);
+    });
+
+    socketInstance.on('disconnect', () => {
+      console.log('Disconnected from server');
+      setIsConnected(false);
+    });
+
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, []);
+
+  const handleJoinGame = (gameId: string) => {
+    if (socket && isConnected) {
+      console.log('Joining game:', gameId, 'Player:', playerId);
+      setLoading(true);
+      socket.emit('join_game', gameId, playerId);
+    } else {
+      alert('Connecting to server... Please try again.');
+    }
+  };
+
+  return (
+    <div className="app">
+      <header>
+        <h1>Rummikube Multiplayer</h1>
+        <p>Player ID: {playerId}</p>
+      </header>
+      <main>
+        {!gameState ? (
+          <div className="lobby">
+            <h2>Game Lobby</h2>
+            <p>Status: {isConnected ? '✅ Connected' : '⏳ Connecting...'}</p>
+            <p>Your ID: {playerId || 'Generating...'}</p>
+            <button 
+              onClick={() => handleJoinGame('game-1')}
+              disabled={!isConnected || loading}
+            >
+              {loading ? 'Joining...' : 'Join Game 1'}
+            </button>
+          </div>
+        ) : (
+          <div className="game">
+            <h2>Game in Progress</h2>
+            <div className="game-info">
+              <p>Players: {gameState.players.join(', ')}</p>
+              <p>Current Player: {gameState.currentPlayer}</p>
+              <p>Status: {gameState.gameStatus}</p>
+            </div>
+            <div className="game-board">
+              <div className="player-hand">
+                <h3>Your Hand</h3>
+                {/* Tiles will be displayed here */}
+              </div>
+              <div className="game-table">
+                <h3>Table</h3>
+                {/* Melds will be displayed here */}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
