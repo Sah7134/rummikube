@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "dev": "npm run dev --workspaces",
-    "build": "npm --prefix packages/game-logic run build && npm --prefix packages/backend run build && npx vite build",
+    "build": "npm --prefix packages/game-logic run build && npm --prefix packages/backend run build && node ./node_modules/vite/bin/vite.js build",
     "start": "npm start --workspaces"
   },
   "devDependencies": {
