@@ -1,8 +1,9 @@
-export default {
-  plugins: [require('@vitejs/plugin-react').default()],
-  root: require('path').resolve(__dirname, 'packages/frontend'),
+const path = require('path');
+
+module.exports = {
+  root: path.resolve(__dirname, 'packages/frontend'),
   build: {
-    outDir: require('path').resolve(__dirname, 'packages/frontend/dist')
+    outDir: path.resolve(__dirname, 'packages/frontend/dist')
   },
   server: {
     port: 3000,
