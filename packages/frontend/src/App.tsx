@@ -16,9 +16,21 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const serverUrl = 
-      (import.meta as any).env.VITE_SERVER_URL || 
-      'http://localhost:4000';
+    // Determine server URL dynamically based on current domain
+    let serverUrl = (import.meta as any).env.VITE_SERVER_URL;
+    
+    if (!serverUrl || serverUrl.includes('localhost')) {
+      // In production, replace frontend domain with backend domain
+      const currentHost = window.location.hostname;
+      if (currentHost.includes('rummikube-frontend')) {
+        serverUrl = 'https://rummikube-backend.onrender.com';
+      } else if (!currentHost.includes('localhost')) {
+        // Assume backend has same domain pattern
+        serverUrl = `https://${currentHost.replace('frontend', 'backend')}`;
+      } else {
+        serverUrl = 'http://localhost:4000';
+      }
+    }
     
     console.log('Connecting to server:', serverUrl);
     const socketInstance = io(serverUrl, {
