@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
@@ -10,12 +10,13 @@ const app = express();
 const httpServer = createServer(app);
 
 // Determine allowed origins based on environment
-const allowedOrigins = [
+const allowedOrigins: (string | RegExp)[] = [
   'http://localhost:3000',
-  'http://localhost:3001',
-  process.env.CLIENT_URL,
-  process.env.FRONTEND_URL
-].filter(Boolean);
+  'http://localhost:3001'
+];
+
+if (process.env.CLIENT_URL) allowedOrigins.push(process.env.CLIENT_URL);
+if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
 
 console.log('Allowed origins:', allowedOrigins);
 
@@ -31,7 +32,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
